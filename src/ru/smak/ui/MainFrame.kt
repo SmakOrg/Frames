@@ -1,10 +1,10 @@
 package ru.smak.ui
 
+import ru.smak.ui.painting.CartesianPainter
+import ru.smak.ui.painting.CartesianPlane
 import java.awt.Color
 import java.awt.Dimension
 import javax.swing.*
-import javax.swing.event.ChangeEvent
-import javax.swing.event.ChangeListener
 
 class MainFrame : JFrame(){
 
@@ -25,7 +25,25 @@ class MainFrame : JFrame(){
         defaultCloseOperation = EXIT_ON_CLOSE
         minimumSize = Dimension(600, 400)
 
-        mainPanel = GraphicsPanel().apply {
+        xMinM = SpinnerNumberModel(-1.0, -100.0, 4.9, 0.1)
+        xMin = JSpinner(xMinM)
+        xMaxM = SpinnerNumberModel(5.0, -4.9, 100.0, 0.1)
+        xMax = JSpinner(xMaxM)
+        yMinM = SpinnerNumberModel(-5.0, -100.0, 4.9, 0.1)
+        yMin = JSpinner(yMinM)
+        yMaxM = SpinnerNumberModel(3.0, -4.9, 100.0, 0.1)
+        yMax = JSpinner(yMaxM)
+
+        val mainPlane = CartesianPlane(
+            xMinM.value as Double,
+            xMaxM.value as Double,
+            yMinM.value as Double,
+            yMaxM.value as Double
+        )
+
+        val cartesianPainter = CartesianPainter(mainPlane)
+
+        mainPanel = GraphicsPanel(cartesianPainter).apply {
             background = Color.WHITE
         }
 
@@ -54,20 +72,13 @@ class MainFrame : JFrame(){
             )
         }
 
-        xMinM = SpinnerNumberModel(-5.0, -100.0, 4.9, 0.1)
-        xMin = JSpinner(xMinM)
-        xMaxM = SpinnerNumberModel(5.0, -4.9, 100.0, 0.1)
-        xMax = JSpinner(xMaxM)
-        yMinM = SpinnerNumberModel(-5.0, -100.0, 4.9, 0.1)
-        yMin = JSpinner(yMinM)
-        yMaxM = SpinnerNumberModel(5.0, -4.9, 100.0, 0.1)
-        yMax = JSpinner(yMaxM)
-
         /*xMax.addChangeListener(object : ChangeListener{
             override fun stateChanged(e: ChangeEvent?) {
                 TODO("Not yet implemented")
             }
         })*/
+
+
         xMin.addChangeListener{ xMaxM.minimum = xMin.value as Double + 0.1 }
         xMax.addChangeListener{ xMinM.maximum = xMax.value as Double - 0.1 }
         yMin.addChangeListener{ yMaxM.minimum = yMin.value as Double + 0.1 }
@@ -109,5 +120,8 @@ class MainFrame : JFrame(){
                     .addGap(4)
             )
         }
+        pack()
+        mainPlane.width = mainPanel.width
+        mainPlane.height = mainPanel.height
     }
 }
