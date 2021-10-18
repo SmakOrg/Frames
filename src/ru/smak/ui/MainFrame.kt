@@ -1,7 +1,12 @@
 package ru.smak.ui
 
+import ru.smak.ui.painting.CartesianPainter
+import ru.smak.ui.painting.CartesianPlane
 import java.awt.Color
 import java.awt.Dimension
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
+import java.awt.event.ComponentListener
 import javax.swing.*
 import javax.swing.event.ChangeEvent
 import javax.swing.event.ChangeListener
@@ -25,9 +30,34 @@ class MainFrame : JFrame(){
         defaultCloseOperation = EXIT_ON_CLOSE
         minimumSize = Dimension(600, 400)
 
-        mainPanel = GraphicsPanel().apply {
+        xMinM = SpinnerNumberModel(-3.0, -100.0, 4.9, 0.1)
+        xMin = JSpinner(xMinM)
+        xMaxM = SpinnerNumberModel(5.0, -4.9, 100.0, 0.1)
+        xMax = JSpinner(xMaxM)
+        yMinM = SpinnerNumberModel(-1.0, -100.0, 4.9, 0.1)
+        yMin = JSpinner(yMinM)
+        yMaxM = SpinnerNumberModel(5.0, -4.9, 100.0, 0.1)
+        yMax = JSpinner(yMaxM)
+
+        val plane = CartesianPlane(
+            xMin.value as Double,
+            xMax.value as Double,
+            yMin.value as Double,
+            yMax.value as Double,
+        )
+        val cartesianPainter = CartesianPainter(plane)
+
+        mainPanel = GraphicsPanel(cartesianPainter).apply {
             background = Color.WHITE
         }
+
+        mainPanel.addComponentListener(object : ComponentAdapter() {
+            override fun componentResized(e: ComponentEvent?) {
+                plane.width = mainPanel.width
+                plane.height = mainPanel.height
+                mainPanel.repaint()
+            }
+        })
 
         controlPanel = JPanel().apply{
             background = Color.RED
@@ -54,24 +84,31 @@ class MainFrame : JFrame(){
             )
         }
 
-        xMinM = SpinnerNumberModel(-5.0, -100.0, 4.9, 0.1)
-        xMin = JSpinner(xMinM)
-        xMaxM = SpinnerNumberModel(5.0, -4.9, 100.0, 0.1)
-        xMax = JSpinner(xMaxM)
-        yMinM = SpinnerNumberModel(-5.0, -100.0, 4.9, 0.1)
-        yMin = JSpinner(yMinM)
-        yMaxM = SpinnerNumberModel(5.0, -4.9, 100.0, 0.1)
-        yMax = JSpinner(yMaxM)
-
         /*xMax.addChangeListener(object : ChangeListener{
             override fun stateChanged(e: ChangeEvent?) {
                 TODO("Not yet implemented")
             }
         })*/
-        xMin.addChangeListener{ xMaxM.minimum = xMin.value as Double + 0.1 }
-        xMax.addChangeListener{ xMinM.maximum = xMax.value as Double - 0.1 }
-        yMin.addChangeListener{ yMaxM.minimum = yMin.value as Double + 0.1 }
-        yMax.addChangeListener{ yMinM.maximum = yMax.value as Double - 0.1 }
+        xMin.addChangeListener{
+            xMaxM.minimum = xMin.value as Double + 0.1
+            plane.xSegment = Pair(xMin.value as Double, xMax.value as Double)
+            mainPanel.repaint()
+        }
+        xMax.addChangeListener{
+            xMinM.maximum = xMax.value as Double - 0.1
+            plane.xSegment = Pair(xMin.value as Double, xMax.value as Double)
+            mainPanel.repaint()
+        }
+        yMin.addChangeListener{
+            yMaxM.minimum = yMin.value as Double + 0.1
+            plane.ySegment = Pair(yMin.value as Double, yMax.value as Double)
+            mainPanel.repaint()
+        }
+        yMax.addChangeListener{
+            yMinM.maximum = yMax.value as Double - 0.1
+            plane.ySegment = Pair(yMin.value as Double, yMax.value as Double)
+            mainPanel.repaint()
+        }
 
         controlPanel.layout = GroupLayout(controlPanel).apply {
             setHorizontalGroup(
@@ -109,5 +146,10 @@ class MainFrame : JFrame(){
                     .addGap(4)
             )
         }
+
+        pack()
+
+        plane.width = mainPanel.width
+        plane.height = mainPanel.height
     }
 }
