@@ -4,6 +4,10 @@ import ru.smak.ui.painting.CartesianPainter
 import ru.smak.ui.painting.CartesianPlane
 import java.awt.Color
 import java.awt.Dimension
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
+import java.awt.event.ComponentListener
+import java.beans.PropertyChangeListener
 import javax.swing.*
 
 class MainFrame : JFrame(){
@@ -25,13 +29,13 @@ class MainFrame : JFrame(){
         defaultCloseOperation = EXIT_ON_CLOSE
         minimumSize = Dimension(600, 400)
 
-        xMinM = SpinnerNumberModel(-1.0, -100.0, 4.9, 0.1)
+        xMinM = SpinnerNumberModel(-5.0, -100.0, 4.9, 0.1)
         xMin = JSpinner(xMinM)
         xMaxM = SpinnerNumberModel(5.0, -4.9, 100.0, 0.1)
         xMax = JSpinner(xMaxM)
         yMinM = SpinnerNumberModel(-5.0, -100.0, 4.9, 0.1)
         yMin = JSpinner(yMinM)
-        yMaxM = SpinnerNumberModel(3.0, -4.9, 100.0, 0.1)
+        yMaxM = SpinnerNumberModel(5.0, -4.9, 100.0, 0.1)
         yMax = JSpinner(yMaxM)
 
         val mainPlane = CartesianPlane(
@@ -46,6 +50,14 @@ class MainFrame : JFrame(){
         mainPanel = GraphicsPanel(cartesianPainter).apply {
             background = Color.WHITE
         }
+        mainPlane.pixelSize = mainPanel.size
+
+        mainPanel.addComponentListener(object: ComponentAdapter() {
+            override fun componentResized(e: ComponentEvent?) {
+                mainPlane.pixelSize = mainPanel.size
+                mainPanel.repaint()
+            }
+        })
 
         controlPanel = JPanel().apply{
             background = Color.RED
@@ -72,17 +84,26 @@ class MainFrame : JFrame(){
             )
         }
 
-        /*xMax.addChangeListener(object : ChangeListener{
-            override fun stateChanged(e: ChangeEvent?) {
-                TODO("Not yet implemented")
-            }
-        })*/
-
-
-        xMin.addChangeListener{ xMaxM.minimum = xMin.value as Double + 0.1 }
-        xMax.addChangeListener{ xMinM.maximum = xMax.value as Double - 0.1 }
-        yMin.addChangeListener{ yMaxM.minimum = yMin.value as Double + 0.1 }
-        yMax.addChangeListener{ yMinM.maximum = yMax.value as Double - 0.1 }
+        xMin.addChangeListener{
+            xMaxM.minimum = xMin.value as Double + 0.1
+            mainPlane.xSegment = Pair(xMin.value as Double, xMax.value as Double)
+            mainPanel.repaint()
+        }
+        xMax.addChangeListener{
+            xMinM.maximum = xMax.value as Double - 0.1
+            mainPlane.xSegment = Pair(xMin.value as Double, xMax.value as Double)
+            mainPanel.repaint()
+        }
+        yMin.addChangeListener{
+            yMaxM.minimum = yMin.value as Double + 0.1
+            mainPlane.ySegment = Pair(yMin.value as Double, yMax.value as Double)
+            mainPanel.repaint()
+        }
+        yMax.addChangeListener{
+            yMinM.maximum = yMax.value as Double - 0.1
+            mainPlane.ySegment = Pair(yMin.value as Double, yMax.value as Double)
+            mainPanel.repaint()
+        }
 
         controlPanel.layout = GroupLayout(controlPanel).apply {
             setHorizontalGroup(

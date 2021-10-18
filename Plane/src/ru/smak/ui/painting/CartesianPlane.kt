@@ -1,5 +1,6 @@
 package ru.smak.ui.painting
 
+import java.awt.Dimension
 import kotlin.math.max
 
 class CartesianPlane(
@@ -8,18 +9,31 @@ class CartesianPlane(
     yMin: Double,
     yMax: Double
 ) {
+
+    /**
+     * Размер плоскости в пикселях
+     */
+    var pixelSize: Dimension = Dimension(1, 1)
+        set(size){
+            field = Dimension(max(1, size.width), max(1, size.height))
+        }
+
     /**
      * Ширина плоскости в пикселях
      */
-    private var xSize: Int = 1
+    private var xSize: Int
+        get() = pixelSize.width
+        set(w) {pixelSize.width = w}
 
     /**
      * Высота плоскости в пикселях
      */
-    private var ySize: Int = 1
+    private var ySize: Int
+        get() = pixelSize.height
+        set(h) {pixelSize.height = h}
 
     /**
-     * Номер последнего видимого ппикселя по ширине
+     * Номер последнего видимого пикселя по ширине
      */
     var width: Int
         get() = xSize - 1
@@ -38,21 +52,29 @@ class CartesianPlane(
 
     /**
      * Левая граница отображаемого отрезка по оси абсцисс
+     * Для изменения значения воспользуйтесь свойством xSegment
+     * @see xSegment
      */
     var xMin: Double = 0.0
         private set
     /**
      * Правая граница отображаемого отрезка по оси абсцисс
+     * Для изменения значения воспользуйтесь свойством xSegment
+     * @see xSegment
      */
     var xMax: Double = 0.0
         private set
     /**
      * Нижняя граница отображаемого отрезка по оси ординат
+     * Для изменения значения воспользуйтесь свойством ySegment
+     * @see ySegment
      */
     var yMin: Double = 0.0
         private set
     /**
      * Верхняя граница отображаемого отрезка по оси ординат
+     * Для изменения значения воспользуйтесь свойством ySegment
+     * @see ySegment
      */
     var yMax: Double = 0.0
         private set
