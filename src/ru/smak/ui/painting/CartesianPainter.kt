@@ -1,11 +1,11 @@
 package ru.smak.ui.painting
 
-import java.awt.BasicStroke
-import java.awt.Color
-import java.awt.Graphics
-import java.awt.Graphics2D
+import java.awt.*
 
 class CartesianPainter(private val plane: CartesianPlane) {
+
+    var mainFont: Font = Font("Cambria", Font.BOLD, 16)
+    var maxTickColor: Color = Color.RED
 
     fun paint(g: Graphics) {
         with(plane) {
@@ -19,6 +19,24 @@ class CartesianPainter(private val plane: CartesianPlane) {
                     drawLine(0, height, width, height)
                     drawLine(0, 0, width, 0)
                 } else drawLine(0, yCrt2Scr(0.0), width, yCrt2Scr(0.0))
+                drawXLabels(g)
+            }
+        }
+    }
+
+    private fun drawXLabels(g: Graphics) {
+        with (g as Graphics2D){
+            stroke = BasicStroke(2F)
+            color = maxTickColor
+            font = mainFont
+            var tickValue = 1.0
+            with(plane) {
+                var tSize = 8
+                drawLine(xCrt2Scr(tickValue), yCrt2Scr(0.0)-tSize, xCrt2Scr(tickValue), yCrt2Scr(0.0)+tSize)
+                val (tW, tH) = with(fontMetrics.getStringBounds(tickValue.toString(), g)){
+                    Pair(width.toInt(), height.toInt())
+                }
+                drawString(tickValue.toString(), xCrt2Scr(tickValue) - tW/2, yCrt2Scr(0.0) + tSize + tH)
             }
         }
     }
