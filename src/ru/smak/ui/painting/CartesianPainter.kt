@@ -2,12 +2,12 @@ package ru.smak.ui.painting
 
 import java.awt.*
 
-class CartesianPainter(private val plane: CartesianPlane) {
+class CartesianPainter(private val plane: CartesianPlane) : Painter{
 
     var mainFont: Font = Font("Cambria", Font.BOLD, 16)
     var maxTickColor: Color = Color.RED
 
-    fun paint(g: Graphics) {
+    override fun paint(g: Graphics) {
         with(plane) {
             (g as Graphics2D).apply {
                 stroke = BasicStroke(3F)

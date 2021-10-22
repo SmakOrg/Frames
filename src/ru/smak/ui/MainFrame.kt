@@ -1,12 +1,12 @@
 package ru.smak.ui
 
+import ru.smak.Test
 import ru.smak.ui.painting.CartesianPainter
 import ru.smak.ui.painting.CartesianPlane
+import ru.smak.ui.painting.FunctionPainter
 import java.awt.Color
 import java.awt.Dimension
-import java.awt.event.ComponentAdapter
-import java.awt.event.ComponentEvent
-import java.awt.event.ComponentListener
+import java.awt.event.*
 import javax.swing.*
 import javax.swing.event.ChangeEvent
 import javax.swing.event.ChangeListener
@@ -30,11 +30,11 @@ class MainFrame : JFrame(){
         defaultCloseOperation = EXIT_ON_CLOSE
         minimumSize = Dimension(600, 400)
 
-        xMinM = SpinnerNumberModel(-3.0, -100.0, 4.9, 0.1)
+        xMinM = SpinnerNumberModel(-5.0, -100.0, 4.9, 0.1)
         xMin = JSpinner(xMinM)
         xMaxM = SpinnerNumberModel(5.0, -4.9, 100.0, 0.1)
         xMax = JSpinner(xMaxM)
-        yMinM = SpinnerNumberModel(-1.0, -100.0, 4.9, 0.1)
+        yMinM = SpinnerNumberModel(-5.0, -100.0, 4.9, 0.1)
         yMin = JSpinner(yMinM)
         yMaxM = SpinnerNumberModel(5.0, -4.9, 100.0, 0.1)
         yMax = JSpinner(yMaxM)
@@ -46,11 +46,26 @@ class MainFrame : JFrame(){
             yMax.value as Double,
         )
         val cartesianPainter = CartesianPainter(plane)
-
-        mainPanel = GraphicsPanel(cartesianPainter).apply {
+        val sinPainter = FunctionPainter(plane, Math::sin)
+        val cosPainter = FunctionPainter(plane, Math::cos)
+        cosPainter.funColor = Color.GREEN
+        val test1 = Test(3)
+        val test2 = Test(1)
+        val test1Painter = FunctionPainter(plane, test1::f)
+        test1Painter.funColor = Color.ORANGE
+        val test2Painter = FunctionPainter(plane, test2::f)
+        test2Painter.funColor = Color.PINK
+        val painters = mutableListOf(cartesianPainter, sinPainter, cosPainter, test1Painter, test2Painter)
+        mainPanel = GraphicsPanel(painters).apply {
             background = Color.WHITE
         }
-
+        mainPanel.addMouseListener(object: MouseAdapter(){
+            override fun mouseClicked(e: MouseEvent?) {
+                super.mouseClicked(e)
+                if (painters.size>0) painters.removeAt(0)
+                mainPanel.repaint()
+            }
+        })
         mainPanel.addComponentListener(object : ComponentAdapter() {
             override fun componentResized(e: ComponentEvent?) {
                 plane.width = mainPanel.width
