@@ -2,11 +2,10 @@ package ru.smak.ui
 
 import ru.smak.ui.painting.CartesianPainter
 import ru.smak.ui.painting.CartesianPlane
+import ru.smak.ui.painting.FunctionPainter
 import java.awt.Color
 import java.awt.Dimension
-import java.awt.event.ComponentAdapter
-import java.awt.event.ComponentEvent
-import java.awt.event.ComponentListener
+import java.awt.event.*
 import java.beans.PropertyChangeListener
 import javax.swing.*
 
@@ -46,10 +45,21 @@ class MainFrame : JFrame(){
         )
 
         val cartesianPainter = CartesianPainter(mainPlane)
+        val sinPainter = FunctionPainter(mainPlane)
 
-        mainPanel = GraphicsPanel(cartesianPainter).apply {
+        val painters = mutableListOf(cartesianPainter, sinPainter)
+
+        mainPanel = GraphicsPanel(painters).apply {
             background = Color.WHITE
         }
+
+        mainPanel.addMouseListener(object : MouseAdapter(){
+            override fun mouseClicked(e: MouseEvent?) {
+                if (painters.size > 0) painters.removeAt(painters.size - 1)
+                mainPanel.repaint()
+            }
+        })
+
         mainPlane.pixelSize = mainPanel.size
 
         mainPanel.addComponentListener(object: ComponentAdapter() {
@@ -60,7 +70,6 @@ class MainFrame : JFrame(){
         })
 
         controlPanel = JPanel().apply{
-            background = Color.RED
         }
         layout = GroupLayout(contentPane).apply{
             setHorizontalGroup(

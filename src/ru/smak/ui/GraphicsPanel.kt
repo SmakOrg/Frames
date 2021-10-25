@@ -1,14 +1,17 @@
 package ru.smak.ui
 
-import ru.smak.ui.painting.CartesianPainter
-import java.awt.Color
+import ru.smak.ui.painting.Painter
 import java.awt.Graphics
 import javax.swing.JPanel
 
-class GraphicsPanel(val painter: CartesianPainter) : JPanel() {
+class GraphicsPanel(val painters: List<Painter>) : JPanel() {
 
     override fun paint(g: Graphics?) {
         super.paint(g)
-        g?.let{painter.paint(it)}
+        g?.let{
+            painters.forEach { p->
+                p.paint(it)
+            }
+        }
     }
 }
