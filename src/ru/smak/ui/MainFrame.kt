@@ -46,8 +46,11 @@ class MainFrame : JFrame(){
 
         val cartesianPainter = CartesianPainter(mainPlane)
         val sinPainter = FunctionPainter(mainPlane)
+        val cosPainter = FunctionPainter(mainPlane)
+        cosPainter.function = Math::cos
+        cosPainter.funColor = Color.GREEN
 
-        val painters = mutableListOf(cartesianPainter, sinPainter)
+        val painters = mutableListOf(cartesianPainter, sinPainter, cosPainter)
 
         mainPanel = GraphicsPanel(painters).apply {
             background = Color.WHITE
